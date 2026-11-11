@@ -60,11 +60,11 @@
         <!--begin::Page bg image-->
         <style>
             body {
-                background-image: url('{{ asset('assets/media/auth/bg6.jpg') }}');
+                background-image: url('{{ asset('assets/media/auth/bg9.jpg') }}');
             }
 
             [data-bs-theme="dark"] body {
-                background-image: url('{{ asset('assets/media/auth/bg6-dark.jpg') }}');
+                background-image: url('{{ asset('assets/media/auth/bg9-dark.jpg') }}');
             }
         </style>
         <!--end::Page bg image-->
@@ -75,7 +75,7 @@
                 <!--begin::Aside-->
                 <div class="d-flex flex-center flex-lg-start flex-column">
                     <!--begin::Logo-->
-                    <img alt="Logo" src="{{ asset('assets/img/Logo_Click_Transparente.png') }}" width="80%" />
+                    <img alt="Logo" src="{{ asset('assets/img/logo_moto.png') }}" width="100%" />
                     <!--end::Logo-->
                     <!--begin::Title-->
                     <br>

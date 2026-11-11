@@ -77,7 +77,7 @@
 								<div class="row mt-4">
 									<div class="col-md-12">
                                         <center>
-                                            <img alt="Logo" src="{{asset('assets/img/Logo_Click_G.jpeg')}}" width="80%" />
+                                            <img alt="Logo" src="{{asset('assets/img/logo_moto.jpg')}}" width="60%" />
                                         </center>
 									</div>
                                     <!--
