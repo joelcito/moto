@@ -18,6 +18,7 @@ class Producto extends Model
         'categoria_producto_id',
         'nombre',
         'codigo',
+        'descripcion',
         'minimo_stock',
         'precio_compra',
         'precio_venta',

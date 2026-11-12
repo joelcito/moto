@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoriaProductoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MigracionController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProfileController;
@@ -181,6 +182,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/utilidades/pdf', [ReporteController::class, 'utilidadesPdf'])->name('reporte.utilidades.pdf');
         Route::get('/utilidades/excel', [ReporteController::class, 'utilidadesExcel'])->name('reporte.utilidades.excel');
+    });
+
+    Route::prefix('/migracion')->group(function() {
+        Route::get('/migrarPorductos', [MigracionController::class, 'migrarPorductos']);
     });
 });
 

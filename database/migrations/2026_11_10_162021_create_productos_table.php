@@ -25,6 +25,7 @@ return new class extends Migration
 
             $table->string('nombre')->nullable();
             $table->string('codigo')->nullable();
+            $table->text('descripcion')->nullable();
             $table->decimal('minimo_stock', 12, 2)->nullable();
             $table->decimal('precio_compra', 12, 2)->nullable();
             $table->decimal('precio_venta', 12, 2)->nullable();
