@@ -15,10 +15,10 @@
     <meta property="og:locale" content="en_BO" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Sistema de Control de Inventario en Línea - Gestión Simplificada para Empresas" />
-    <meta property="og:url" content="http://importadoraclick.com/" />
+    <meta property="og:url" content="https://infinitassoluciones.net/" />
     <meta property="og:site_name" content="Sistema de Inventario en Línea" />
-    <link rel="canonical" href="http://importadoraclick.com/" />
-    <link rel="shortcut icon" href="{{ asset('assets/img/Logo_Click_Icono.png') }}" />
+    <link rel="canonical" href="https://infinitassoluciones.net/" />
+    <link rel="shortcut icon" href="{{ asset('assets/img/logo_moto.png') }}" />
     <!--begin::Fonts(mandatory for all pages)-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
     <!--end::Fonts-->

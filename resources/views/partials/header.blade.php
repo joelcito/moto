@@ -14,7 +14,7 @@
         <!--begin::Mobile logo-->
         <div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
             <a href="{{ url('home') }}" class="d-lg-none">
-                <img alt="Logo" src="{{asset('assets/img/lop.jpg')}}" class="h-40px app-sidebar-logo-minimize" width="100%" />
+                <img alt="Logo" src="{{asset('assets/img/logo_moto.jpg')}}" class="h-40px app-sidebar-logo-minimize" width="100%" />
             </a>
         </div>
         <!--end::Mobile logo-->
@@ -25,104 +25,6 @@
                 <!--begin::Menu-->
                 <div class="menu menu-rounded menu-column menu-lg-row my-5 my-lg-0 align-items-stretch fw-semibold px-2 px-lg-0" id="kt_app_header_menu" data-kt-menu="true">
 
-                    {{-- <!-- accesos directos -->
-                    @rol(1,2,6)
-                    <!--begin:Menu item-->
-                    <div class="menu-item me-0 me-lg-2">
-                        <a href="{{ route('factura.formulario') }}" class="menu-link">
-                            <span class="menu-icon">
-                                <i class="ki-duotone ki-element-11 fs-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                    <span class="path3"></span>
-                                    <span class="path4"></span>
-                                </i>
-                            </span>
-                            <span class="menu-title">Form. Ventas</span>
-                        </a>
-                    </div>
-                    <!--end:Menu item-->
-                    @endrol
-
-                    @rol(1,3)
-                    <!--begin:Menu item-->
-                    <div class="menu-item me-0 me-lg-2">
-                        <a href="{{ route('reporte.listado') }}" class="menu-link">
-                            <span class="menu-icon">
-                                <i class="ki-duotone ki-abstract-28 fs-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                            </span>
-                            <span class="menu-title">KARDEX</span>
-                        </a>
-                    </div>
-                    <!--end:Menu item-->
-                    @endrol
-
-                    @rol(1,2,3,6)
-                    <!--begin:Menu item-->
-                    <div class="menu-item me-0 me-lg-2">
-                        <a href="{{ route('producto.listadoSerie') }}" class="menu-link">
-                            <span class="menu-icon">
-                                <i class="ki-duotone ki-abstract-28 fs-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                            </span>
-                            <span class="menu-title">PROD. SERIE</span>
-                        </a>
-                    </div>
-                    <!--end:Menu item-->
-                    @endrol
-
-                    @rol(1,2,6)
-                    <!--begin:Menu item-->
-                    <div class="menu-item me-0 me-lg-2">
-                        <a href="{{ route('factura.formularioFacturacion') }}" class="menu-link">
-                            <span class="menu-icon">
-                                <i class="ki-duotone ki-abstract-28 fs-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                            </span>
-                            <span class="menu-title">FORM FAC.</span>
-                        </a>
-                    </div>
-                    <!--end:Menu item-->
-                    @endrol
-
-                    @rol(1,2,3,6)
-                    <!--begin:Menu item-->
-                    <div class="menu-item me-0 me-lg-2">
-                        <a href="{{ route('producto.busqueda') }}" class="menu-link">
-                            <span class="menu-icon">
-                                <i class="ki-duotone ki-abstract-28 fs-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                            </span>
-                            <span class="menu-title">STOCK</span>
-                        </a>
-                    </div>
-                    <!--end:Menu item-->
-                    @endrol
-
-                    @rol(1,2,6)
-                    <!--begin:Menu item-->
-                    <div class="menu-item me-0 me-lg-2">
-                        <a href="{{ route('pago.listado') }}" class="menu-link">
-                            <span class="menu-icon">
-                                <i class="ki-duotone ki-abstract-28 fs-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                            </span>
-                            <span class="menu-title">PAGOS</span>
-                        </a>
-                    </div>
-                    <!--end:Menu item-->
-                    @endrol --}}
 
                 </div>
                 <!--end::Menu-->
