@@ -24,9 +24,11 @@
     </style>
 </head>
 <body>
+@component('partials.logoReporte')
     <h2>Reporte de Pagos / Movimientos</h2>
 
-    <table>
+    @endcomponent
+<table>
         <thead>
             <tr>
                 <th>SUCURSAL</th>

@@ -51,10 +51,12 @@
 </head>
 
 <body>
+@component('partials.logoReporte')
 
     <h2>CUENTAS POR COBRAR</h2>
 
-    <table>
+    @endcomponent
+<table>
 
         <thead>
 

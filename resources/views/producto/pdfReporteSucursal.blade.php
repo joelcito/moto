@@ -71,12 +71,13 @@
 @php
     use Carbon\Carbon;
 
-    $path = public_path('img/logo_deportivo.png');
+    $path = public_path('assets/img/logo_moto.jpg');
     $type = pathinfo($path, PATHINFO_EXTENSION);
     $data = file_get_contents($path);
     $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
 @endphp
 <body>
+
     {{-- <div class="header">
         <h2>TOTAL {{ strtoupper($operativa) }}S DE PRODUCTOS POR SUCURSAL</h2>
         <p>Desde {{ Carbon::parse($fecha_ini)->format('d/m/Y') }} hasta {{ Carbon::parse($fecha_fin)->format('d/m/Y') }}</p>
@@ -85,11 +86,12 @@
     <div style="position: relative; width: 100%; margin-bottom: 1px; height: 90px;">
         <!-- Logo a la izquierda -->
         <div style="position: absolute; top: 0; left: 0;">
-            <img src="{{ $base64 }}" alt="Logo" width="90">
+@include('partials.logoReporte', ['soloImagen' => true])
+
         </div>
 
         <!-- Texto completamente centrado -->
-        <div style="text-align: center;">
+        <div style="text-align: center; padding: 0 105px;">
             <h2 style="margin: 0; font-size: 13pt;">
                 TOTAL {{ strtoupper($operativa) }}S DE PRODUCTOS POR SUCURSAL
             </h2>

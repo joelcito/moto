@@ -47,9 +47,11 @@
 </head>
 
 <body>
+@component('partials.logoReporte')
 
     <h2>REPORTE DE INVENTARIO</h2>
-    <table>
+    @endcomponent
+<table>
         <thead>
             <tr>
                 <th>N°</th>

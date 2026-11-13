@@ -67,6 +67,7 @@
 </head>
 
 <body>
+@component('partials.logoReporte')
 
     <h2>
         REPORTE DE UTILIDADES
@@ -93,7 +94,8 @@
     RESUMEN
     =========================================== --}}
 
-    <table class="resumen">
+    @endcomponent
+<table class="resumen">
 
         <tr>
 

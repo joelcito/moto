@@ -82,6 +82,7 @@
 </head>
 
 <body>
+@component('partials.logoReporte')
 
     <h2>
         REPORTE DE FLUJO DE EFECTIVO
@@ -95,7 +96,8 @@
 
     {{-- RESUMEN --}}
 
-    <table class="resumen">
+    @endcomponent
+<table class="resumen">
 
         <tr>
 

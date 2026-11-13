@@ -69,13 +69,15 @@
 </head>
 
 <body>
+@component('partials.logoReporte')
 
     <h2>
         KARDEX DE PRODUCTO
     </h2>
 
 
-    <table class="datos-producto">
+    @endcomponent
+<table class="datos-producto">
 
         <tr>
 

@@ -76,7 +76,9 @@
     </style>
 </head>
 <body>
+
     <header>
+@component('partials.logoReporte')
         <table style="width:100%">
             <tr>
                 <td style="text-align:center; font-family: 'Times New Roman', Times, serif; font-size:12px; line-height:100%">
@@ -130,7 +132,8 @@
             </tr>
         </table> --}}
         <hr>
-    </header>
+    @endcomponent
+</header>
     <main>
         <table cellpadding="1" class="celdas" style="font-family: 'Times New Roman', Times, serif; font-size:10px; text-align:center">
             <tr>

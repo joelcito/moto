@@ -64,6 +64,7 @@
 </head>
 
 <body>
+@component('partials.logoReporte')
 
     <div class="titulo">
         REPORTE DE VENTAS
@@ -74,7 +75,8 @@
     </div>
 
 
-    <table>
+    @endcomponent
+<table>
 
         <thead>
 

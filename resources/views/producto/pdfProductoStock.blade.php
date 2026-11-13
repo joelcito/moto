@@ -63,14 +63,16 @@
 @endphp
 
 <body>
+
     <div style="position: relative; width: 100%; margin-bottom: 1px; height: 90px;">
         <!-- Logo a la izquierda -->
-        {{-- <div style="position: absolute; top: 0; left: 0;">
-            <img src="{{ $base64 }}" alt="Logo" width="90">
-        </div> --}}
+        <div style="position: absolute; top: 0; left: 0;">
+@include('partials.logoReporte', ['soloImagen' => true])
+
+        </div>
 
         <!-- Texto completamente centrado -->
-        <div style="text-align: center;">
+        <div style="text-align: center; padding: 0 105px;">
             <h2 style="margin: 0; font-size: 11pt;">
                 STOCK - PRODUCTOS POR SUCURSAL
             </h2>

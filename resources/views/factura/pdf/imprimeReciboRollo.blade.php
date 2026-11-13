@@ -70,7 +70,7 @@
 @php
     use Carbon\Carbon;
 
-   /*  $path = public_path('img/logo_deportivo.png');
+   /*  $path = public_path('assets/img/logo_moto.jpg');
     $type = pathinfo($path, PATHINFO_EXTENSION);
     $data = file_get_contents($path);
     $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data); */
@@ -350,11 +350,14 @@
 
 <div class="container">
 
+
     {{-- ==========================================
         ENCABEZADO
     =========================================== --}}
 
     <div class="header">
+@component('partials.logoReporte', ['anchoLogo' => 45])
+
 
         <p class="header-title">
             VENTA N° {{ $factura->numero_recibo }}
@@ -374,7 +377,8 @@
             {{ date('d/m/Y H:i:s') }}
         </p>
 
-    </div>
+    @endcomponent
+</div>
 
     <div class="separator"></div>
 

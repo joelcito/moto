@@ -121,24 +121,12 @@
     </style>
 </head>
 <body>
-    <div style="position: relative; width: 100%; margin-bottom: 1px; height: 90px;">
-        <!-- Logo a la izquierda -->
-        <div style="position: absolute; top: 0; left: 0;">
-            <img src="" alt="Logo" width="90">
-        </div>
 
-        <!-- Texto completamente centrado -->
-        <div style="text-align: center;">
-            <h2 style="margin: 0; font-size: 13pt;">
-                COMPROBANTE DE {{ $pago->estado }}
-            </h2>
-            <p style="margin: 1pt 0; font-size: 11pt;">Fecha: {{ $pago->fecha }}</p>
-            {{-- <p style="margin: 1pt 0; font-size: 11pt;">Telefono: 77299506 - 22846050</p> --}}
-        </div>
-        <div style="text-align: end;">
-            <p style="font-size: 10pt;">Vendedor: {{ $pago->usuario->name }}</p>
-        </div>
-    </div>
+    @component('partials.logoReporte', ['anchoLogo' => 80])
+        <h2 style="margin: 0 0 6px; font-size: 13pt;">COMPROBANTE DE {{ $pago->estado }}</h2>
+        <p style="margin: 3px 0; font-size: 10pt;">Fecha: {{ $pago->fecha }}</p>
+        <p style="margin: 3px 0; font-size: 10pt; overflow-wrap: break-word;">Vendedor: {{ $pago->usuario->name }}</p>
+    @endcomponent
     {{-- <div class="section-title">Señor(es): </div> --}}
     <table class="table">
         <thead>

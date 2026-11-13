@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ReporteController extends Controller
@@ -26,7 +27,6 @@ class ReporteController extends Controller
         return view('reporte.listado', compact('sucursales', 'productos'));
     }
 
-
     // ============================================================
     // FILTRO FECHAS
     // ============================================================
@@ -34,19 +34,18 @@ class ReporteController extends Controller
     private function fechas(Request $request)
     {
         $fechaInicio = $request->fecha_inicio
-            ? $request->fecha_inicio . ' 00:00:00'
+            ? $request->fecha_inicio.' 00:00:00'
             : now()->startOfMonth()->format('Y-m-d H:i:s');
 
         $fechaFin = $request->fecha_fin
-            ? $request->fecha_fin . ' 23:59:59'
+            ? $request->fecha_fin.' 23:59:59'
             : now()->endOfMonth()->format('Y-m-d H:i:s');
 
         return [
             $fechaInicio,
-            $fechaFin
+            $fechaFin,
         ];
     }
-
 
     // ============================================================
     // ESTILO GENERAL EXCEL
@@ -58,11 +57,9 @@ class ReporteController extends Controller
             "A1:{$ultimaColumna}1"
         )->getFont()->setBold(true)->setSize(14);
 
-
         $hoja->getStyle(
             "A3:{$ultimaColumna}3"
         )->getFont()->setBold(true);
-
 
         $hoja->getStyle(
             "A3:{$ultimaColumna}{$ultimaFila}"
@@ -70,17 +67,14 @@ class ReporteController extends Controller
             Border::BORDER_THIN
         );
 
-
         $hoja->getStyle(
             "A3:{$ultimaColumna}{$ultimaFila}"
         )->getAlignment()->setVertical(
             Alignment::VERTICAL_CENTER
         );
 
-
         foreach (
-            range('A', $ultimaColumna)
-            as $columna
+            range('A', $ultimaColumna) as $columna
         ) {
 
             $hoja
@@ -89,16 +83,46 @@ class ReporteController extends Controller
         }
     }
 
-
     private function descargarExcel(
         Spreadsheet $spreadsheet,
         string $nombre
     ) {
 
+        foreach ($spreadsheet->getAllSheets() as $hoja) {
+            $titulo = $hoja->getCell('A1')->getValue();
+            $ultimaColumna = $hoja->getHighestColumn();
+            $hoja->insertNewRowBefore(1, 6);
+            foreach ($hoja->getMergeCells() as $rango) {
+                if (str_starts_with($rango, 'A7:')) {
+                    $hoja->unmergeCells($rango);
+                }
+            }
+            $hoja->setCellValue('A7', null);
+            $hoja->mergeCells("C1:{$ultimaColumna}5");
+            $hoja->setCellValue('C1', $titulo);
+            $hoja->getStyle('C1')->getFont()->setBold(true)->setSize(16);
+            $hoja->getStyle('C1')->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+                ->setVertical(Alignment::VERTICAL_CENTER)->setWrapText(true);
+            for ($fila = 1; $fila <= 6; $fila++) {
+                $hoja->getRowDimension($fila)->setRowHeight(18);
+            }
+
+            $logo = new Drawing;
+            $logo->setName('Logo MR RAILL');
+            $logo->setDescription('MR RAILL - Accesorios para motos');
+            $logo->setPath(public_path('assets/img/logo_moto.jpg'));
+            $logo->setHeight(125);
+            $logo->setCoordinates('A1');
+            $logo->setOffsetX(8);
+            $logo->setOffsetY(4);
+            $logo->setWorksheet($hoja);
+        }
+
         $writer = new Xlsx($spreadsheet);
 
         $archivo = storage_path(
-            'app/' . $nombre
+            'app/'.$nombre
         );
 
         $writer->save($archivo);
@@ -107,7 +131,6 @@ class ReporteController extends Controller
             ->download($archivo)
             ->deleteFileAfterSend(true);
     }
-
 
     // ============================================================
     // ============================================================
@@ -118,7 +141,6 @@ class ReporteController extends Controller
     private function consultaVentas(Request $request)
     {
         [$inicio, $fin] = $this->fechas($request);
-
 
         $query = DB::table('facturas as f')
 
@@ -143,7 +165,6 @@ class ReporteController extends Controller
                 [$inicio, $fin]
             );
 
-
         if ($request->filled('sucursal_id')) {
 
             $query->where(
@@ -151,7 +172,6 @@ class ReporteController extends Controller
                 $request->sucursal_id
             );
         }
-
 
         return $query
             ->select(
@@ -176,7 +196,6 @@ class ReporteController extends Controller
             ->get();
     }
 
-
     public function ventasPdf(Request $request)
     {
         $datos = $this->consultaVentas($request);
@@ -184,7 +203,6 @@ class ReporteController extends Controller
         $total = $datos
             ->where('estado', '!=', 'Anulado')
             ->sum('total');
-
 
         return Pdf::loadView(
             'reporte.pdf.ventas',
@@ -198,18 +216,15 @@ class ReporteController extends Controller
             ->stream('reporte_ventas.pdf');
     }
 
-
     public function ventasExcel(Request $request)
     {
         $datos = $this->consultaVentas($request);
 
-
-        $excel = new Spreadsheet();
+        $excel = new Spreadsheet;
 
         $hoja = $excel->getActiveSheet();
 
         $hoja->setTitle('Ventas');
-
 
         $hoja->mergeCells('A1:I1');
 
@@ -217,7 +232,6 @@ class ReporteController extends Controller
             'A1',
             'REPORTE DE VENTAS'
         );
-
 
         $hoja->fromArray([
 
@@ -229,25 +243,22 @@ class ReporteController extends Controller
             'Sucursal',
             'Estado Pago',
             'Estado',
-            'Total Bs'
+            'Total Bs',
 
         ], null, 'A3');
-
 
         $fila = 4;
 
         $total = 0;
 
-
         foreach ($datos as $index => $dato) {
 
             $cliente =
                 trim(
-                    ($dato->nombres ?? '') . ' ' .
-                        ($dato->ap_paterno ?? '') . ' ' .
+                    ($dato->nombres ?? '').' '.
+                        ($dato->ap_paterno ?? '').' '.
                         ($dato->ap_materno ?? '')
                 );
-
 
             $hoja->fromArray([
 
@@ -269,31 +280,27 @@ class ReporteController extends Controller
 
                 $dato->estado,
 
-                $dato->total
+                $dato->total,
 
-            ], null, 'A' . $fila);
-
+            ], null, 'A'.$fila);
 
             if ($dato->estado != 'ANULADO') {
 
                 $total += $dato->total;
             }
 
-
             $fila++;
         }
 
-
         $hoja->setCellValue(
-            'H' . $fila,
+            'H'.$fila,
             'TOTAL'
         );
 
         $hoja->setCellValue(
-            'I' . $fila,
+            'I'.$fila,
             $total
         );
-
 
         $this->estiloExcel(
             $hoja,
@@ -301,13 +308,11 @@ class ReporteController extends Controller
             $fila
         );
 
-
         return $this->descargarExcel(
             $excel,
             'reporte_ventas.xlsx'
         );
     }
-
 
     // ============================================================
     // ============================================================
@@ -346,7 +351,6 @@ class ReporteController extends Controller
                 $request->sucursal_id
             );
         }
-
 
         return $query
 
@@ -387,12 +391,10 @@ class ReporteController extends Controller
             ->get();
     }
 
-
     public function cuentasCobrarPdf(Request $request)
     {
         $datos =
             $this->consultaCuentasCobrar($request);
-
 
         $total =
             $datos->sum('total');
@@ -402,7 +404,6 @@ class ReporteController extends Controller
 
         $saldo =
             $datos->sum('saldo');
-
 
         return Pdf::loadView(
             'reporte.pdf.cuentas-cobrar',
@@ -419,19 +420,16 @@ class ReporteController extends Controller
             );
     }
 
-
     public function cuentasCobrarExcel(Request $request)
     {
         $datos =
             $this->consultaCuentasCobrar($request);
 
-
         $excel =
-            new Spreadsheet();
+            new Spreadsheet;
 
         $hoja =
             $excel->getActiveSheet();
-
 
         $hoja->mergeCells('A1:I1');
 
@@ -439,7 +437,6 @@ class ReporteController extends Controller
             'A1',
             'CUENTAS POR COBRAR'
         );
-
 
         $hoja->fromArray([
 
@@ -451,23 +448,20 @@ class ReporteController extends Controller
             'Sucursal',
             'Total',
             'Pagado',
-            'Saldo'
+            'Saldo',
 
         ], null, 'A3');
 
-
         $fila = 4;
-
 
         foreach ($datos as $i => $dato) {
 
             $cliente = trim(
 
-                ($dato->nombres ?? '') . ' ' .
-                    ($dato->ap_paterno ?? '') . ' ' .
+                ($dato->nombres ?? '').' '.
+                    ($dato->ap_paterno ?? '').' '.
                     ($dato->ap_materno ?? '')
             );
-
 
             $hoja->fromArray([
 
@@ -488,35 +482,32 @@ class ReporteController extends Controller
 
                 $dato->pagado,
 
-                $dato->saldo
+                $dato->saldo,
 
-            ], null, 'A' . $fila);
-
+            ], null, 'A'.$fila);
 
             $fila++;
         }
 
-
         $hoja->setCellValue(
-            'F' . $fila,
+            'F'.$fila,
             'TOTALES'
         );
 
         $hoja->setCellValue(
-            'G' . $fila,
+            'G'.$fila,
             $datos->sum('total')
         );
 
         $hoja->setCellValue(
-            'H' . $fila,
+            'H'.$fila,
             $datos->sum('pagado')
         );
 
         $hoja->setCellValue(
-            'I' . $fila,
+            'I'.$fila,
             $datos->sum('saldo')
         );
-
 
         $this->estiloExcel(
             $hoja,
@@ -524,13 +515,11 @@ class ReporteController extends Controller
             $fila
         );
 
-
         return $this->descargarExcel(
             $excel,
             'cuentas_por_cobrar.xlsx'
         );
     }
-
 
     // ============================================================
     // ============================================================
@@ -556,7 +545,6 @@ class ReporteController extends Controller
                         'm.deleted_at'
                     );
 
-
                     if (
                         $request->filled(
                             'sucursal_id'
@@ -578,7 +566,6 @@ class ReporteController extends Controller
                 'p.control_stock',
                 1
             );
-
 
         return $query
 
@@ -624,12 +611,10 @@ class ReporteController extends Controller
             ->get();
     }
 
-
     public function inventarioPdf(Request $request)
     {
         $datos =
             $this->consultaInventario($request);
-
 
         return Pdf::loadView(
             'reporte.pdf.inventario',
@@ -639,19 +624,16 @@ class ReporteController extends Controller
             ->stream('inventario.pdf');
     }
 
-
     public function inventarioExcel(Request $request)
     {
         $datos =
             $this->consultaInventario($request);
 
-
         $excel =
-            new Spreadsheet();
+            new Spreadsheet;
 
         $hoja =
             $excel->getActiveSheet();
-
 
         $hoja->mergeCells('A1:H1');
 
@@ -659,7 +641,6 @@ class ReporteController extends Controller
             'A1',
             'REPORTE DE INVENTARIO'
         );
-
 
         $hoja->fromArray([
 
@@ -670,13 +651,11 @@ class ReporteController extends Controller
             'P. Venta',
             'Stock Mínimo',
             'Stock Actual',
-            'Estado'
+            'Estado',
 
         ], null, 'A3');
 
-
         $fila = 4;
-
 
         foreach ($datos as $i => $dato) {
 
@@ -684,7 +663,6 @@ class ReporteController extends Controller
                 $dato->stock <= $dato->minimo_stock
                 ? 'STOCK BAJO'
                 : 'DISPONIBLE';
-
 
             $hoja->fromArray([
 
@@ -702,14 +680,12 @@ class ReporteController extends Controller
 
                 $dato->stock,
 
-                $estado
+                $estado,
 
-            ], null, 'A' . $fila);
-
+            ], null, 'A'.$fila);
 
             $fila++;
         }
-
 
         $this->estiloExcel(
             $hoja,
@@ -717,13 +693,11 @@ class ReporteController extends Controller
             $fila - 1
         );
 
-
         return $this->descargarExcel(
             $excel,
             'inventario.xlsx'
         );
     }
-
 
     // ============================================================
     // ============================================================
@@ -740,9 +714,8 @@ class ReporteController extends Controller
             'sucursal_id' => 'nullable|integer|exists:sucursales,id',
         ]);
 
-        $fechaInicio = $request->fecha_inicio . ' 00:00:00';
-        $fechaFin = $request->fecha_fin . ' 23:59:59';
-
+        $fechaInicio = $request->fecha_inicio.' 00:00:00';
+        $fechaFin = $request->fecha_fin.' 23:59:59';
 
         // ============================================================
         // PRODUCTO
@@ -753,10 +726,9 @@ class ReporteController extends Controller
             ->whereNull('deleted_at')
             ->first();
 
-        if (!$producto) {
+        if (! $producto) {
             abort(404, 'Producto no encontrado.');
         }
-
 
         // ============================================================
         // SALDO ANTERIOR
@@ -768,7 +740,6 @@ class ReporteController extends Controller
             ->whereNull('deleted_at')
             ->where('fecha', '<', $fechaInicio);
 
-
         if ($request->filled('sucursal_id')) {
 
             $querySaldoAnterior->where(
@@ -776,7 +747,6 @@ class ReporteController extends Controller
                 $request->sucursal_id
             );
         }
-
 
         $saldoAnterior = $querySaldoAnterior
             ->selectRaw('
@@ -786,7 +756,6 @@ class ReporteController extends Controller
             AS saldo
         ')
             ->value('saldo');
-
 
         // ============================================================
         // MOVIMIENTOS DEL PRODUCTO EN EL RANGO SELECCIONADO
@@ -826,10 +795,9 @@ class ReporteController extends Controller
                 'm.fecha',
                 [
                     $fechaInicio,
-                    $fechaFin
+                    $fechaFin,
                 ]
             );
-
 
         // ============================================================
         // FILTRO SUCURSAL
@@ -842,7 +810,6 @@ class ReporteController extends Controller
                 $request->sucursal_id
             );
         }
-
 
         // ============================================================
         // OBTENER MOVIMIENTOS
@@ -872,7 +839,6 @@ class ReporteController extends Controller
 
             ->get();
 
-
         // ============================================================
         // IMPORTANTE:
         // DEVOLVEMOS UN ARRAY, NO SOLO $movimientos
@@ -885,7 +851,6 @@ class ReporteController extends Controller
         ];
     }
 
-
     public function kardexPdf(Request $request)
     {
         $resultado = $this->consultaKardex($request);
@@ -895,7 +860,6 @@ class ReporteController extends Controller
         $saldoAnterior = $resultado['saldoAnterior'];
 
         $datos = $resultado['movimientos'];
-
 
         return Pdf::loadView(
             'reporte.pdf.kardex',
@@ -908,23 +872,20 @@ class ReporteController extends Controller
         )
             ->setPaper('letter', 'landscape')
             ->stream(
-                'kardex_' . ($producto->codigo ?? $producto->id) . '.pdf'
+                'kardex_'.($producto->codigo ?? $producto->id).'.pdf'
             );
     }
-
 
     public function kardexExcel(Request $request)
     {
         $datos =
             $this->consultaKardex($request);
 
-
         $excel =
-            new Spreadsheet();
+            new Spreadsheet;
 
         $hoja =
             $excel->getActiveSheet();
-
 
         $hoja->mergeCells('A1:I1');
 
@@ -932,7 +893,6 @@ class ReporteController extends Controller
             'A1',
             'REPORTE KARDEX'
         );
-
 
         $hoja->fromArray([
 
@@ -944,15 +904,13 @@ class ReporteController extends Controller
             'Descripción',
             'Ingreso',
             'Salida',
-            'Saldo'
+            'Saldo',
 
         ], null, 'A3');
-
 
         $fila = 4;
 
         $saldo = 0;
-
 
         foreach ($datos as $i => $dato) {
 
@@ -960,7 +918,6 @@ class ReporteController extends Controller
                 ($dato->ingreso ?? 0)
                 -
                 ($dato->salida ?? 0);
-
 
             $hoja->fromArray([
 
@@ -980,14 +937,12 @@ class ReporteController extends Controller
 
                 $dato->salida,
 
-                $saldo
+                $saldo,
 
-            ], null, 'A' . $fila);
-
+            ], null, 'A'.$fila);
 
             $fila++;
         }
-
 
         $this->estiloExcel(
             $hoja,
@@ -995,13 +950,11 @@ class ReporteController extends Controller
             $fila - 1
         );
 
-
         return $this->descargarExcel(
             $excel,
             'kardex.xlsx'
         );
     }
-
 
     // ============================================================
     // ============================================================
@@ -1072,7 +1025,6 @@ class ReporteController extends Controller
             ->get();
     }
 
-
     public function flujoEfectivoPdf(Request $request)
     {
         $datos = $this->consultaFlujo($request);
@@ -1085,7 +1037,6 @@ class ReporteController extends Controller
                 ) === 'SI';
             })
             ->sum('monto');
-
 
         // INGRESOS, SIN CONTAR APERTURA
         $totalIngresos = $datos
@@ -1100,7 +1051,6 @@ class ReporteController extends Controller
             })
             ->sum('monto');
 
-
         // SALIDAS
         $totalSalidas = $datos
             ->where(
@@ -1109,13 +1059,11 @@ class ReporteController extends Controller
             )
             ->sum('monto');
 
-
         // SALDO FINAL
         $saldo =
             $totalApertura
             + $totalIngresos
             - $totalSalidas;
-
 
         return Pdf::loadView(
             'reporte.pdf.flujo-efectivo',
@@ -1131,19 +1079,16 @@ class ReporteController extends Controller
             ->stream('flujo_efectivo.pdf');
     }
 
-
     public function flujoEfectivoExcel(Request $request)
     {
         $datos =
             $this->consultaFlujo($request);
 
-
         $excel =
-            new Spreadsheet();
+            new Spreadsheet;
 
         $hoja =
             $excel->getActiveSheet();
-
 
         $hoja->mergeCells('A1:H1');
 
@@ -1151,7 +1096,6 @@ class ReporteController extends Controller
             'A1',
             'FLUJO DE EFECTIVO'
         );
-
 
         $hoja->fromArray([
 
@@ -1162,13 +1106,11 @@ class ReporteController extends Controller
             'Descripción',
             'Forma Pago',
             'Sucursal',
-            'Monto'
+            'Monto',
 
         ], null, 'A3');
 
-
         $fila = 4;
-
 
         foreach ($datos as $i => $dato) {
 
@@ -1188,14 +1130,12 @@ class ReporteController extends Controller
 
                 $dato->sucursal,
 
-                $dato->monto
+                $dato->monto,
 
-            ], null, 'A' . $fila);
-
+            ], null, 'A'.$fila);
 
             $fila++;
         }
-
 
         $this->estiloExcel(
             $hoja,
@@ -1203,13 +1143,11 @@ class ReporteController extends Controller
             $fila - 1
         );
 
-
         return $this->descargarExcel(
             $excel,
             'flujo_efectivo.xlsx'
         );
     }
-
 
     // ============================================================
     // ============================================================
@@ -1222,40 +1160,33 @@ class ReporteController extends Controller
         [$inicio, $fin] =
             $this->fechas($request);
 
-
         $query =
             DB::table('agendas as a')
-
-            ->leftJoin(
-                'clientes as c',
-                'c.id',
-                '=',
-                'a.cliente_id'
-            )
-
-            ->leftJoin(
-                'users as u',
-                'u.id',
-                '=',
-                'a.usuario_asignado_id'
-            )
-
-            ->leftJoin(
-                'sucursales as s',
-                's.id',
-                '=',
-                'a.sucursal_id'
-            )
-
-            ->whereNull(
-                'a.deleted_at'
-            )
-
-            ->whereBetween(
-                'a.fecha_inicio',
-                [$inicio, $fin]
-            );
-
+                ->leftJoin(
+                    'clientes as c',
+                    'c.id',
+                    '=',
+                    'a.cliente_id'
+                )
+                ->leftJoin(
+                    'users as u',
+                    'u.id',
+                    '=',
+                    'a.usuario_asignado_id'
+                )
+                ->leftJoin(
+                    'sucursales as s',
+                    's.id',
+                    '=',
+                    'a.sucursal_id'
+                )
+                ->whereNull(
+                    'a.deleted_at'
+                )
+                ->whereBetween(
+                    'a.fecha_inicio',
+                    [$inicio, $fin]
+                );
 
         if ($request->filled('sucursal_id')) {
 
@@ -1264,7 +1195,6 @@ class ReporteController extends Controller
                 $request->sucursal_id
             );
         }
-
 
         return $query
 
@@ -1303,12 +1233,10 @@ class ReporteController extends Controller
             ->get();
     }
 
-
     public function agendaPdf(Request $request)
     {
         $datos =
             $this->consultaAgenda($request);
-
 
         return Pdf::loadView(
             'reporte.pdf.agenda',
@@ -1320,19 +1248,16 @@ class ReporteController extends Controller
             );
     }
 
-
     public function agendaExcel(Request $request)
     {
         $datos =
             $this->consultaAgenda($request);
 
-
         $excel =
-            new Spreadsheet();
+            new Spreadsheet;
 
         $hoja =
             $excel->getActiveSheet();
-
 
         $hoja->mergeCells('A1:I1');
 
@@ -1340,7 +1265,6 @@ class ReporteController extends Controller
             'A1',
             'REPORTE DE AGENDA'
         );
-
 
         $hoja->fromArray([
 
@@ -1352,23 +1276,20 @@ class ReporteController extends Controller
             'Celular',
             'Responsable',
             'Sucursal',
-            'Estado'
+            'Estado',
 
         ], null, 'A3');
 
-
         $fila = 4;
-
 
         foreach ($datos as $i => $dato) {
 
             $cliente = trim(
 
-                ($dato->nombres ?? '') . ' ' .
-                    ($dato->ap_paterno ?? '') . ' ' .
+                ($dato->nombres ?? '').' '.
+                    ($dato->ap_paterno ?? '').' '.
                     ($dato->ap_materno ?? '')
             );
-
 
             $hoja->fromArray([
 
@@ -1388,21 +1309,18 @@ class ReporteController extends Controller
 
                 $dato->sucursal,
 
-                $dato->estado
+                $dato->estado,
 
-            ], null, 'A' . $fila);
-
+            ], null, 'A'.$fila);
 
             $fila++;
         }
-
 
         $this->estiloExcel(
             $hoja,
             'I',
             $fila - 1
         );
-
 
         return $this->descargarExcel(
             $excel,
@@ -1426,7 +1344,6 @@ class ReporteController extends Controller
             return (float) $item->utilidad;
         });
 
-
         // PRODUCTOS
         $utilidadProductos = $datos
             ->filter(function ($item) {
@@ -1437,7 +1354,6 @@ class ReporteController extends Controller
             })
             ->sum('utilidad');
 
-
         // SERVICIOS
         $utilidadServicios = $datos
             ->filter(function ($item) {
@@ -1447,7 +1363,6 @@ class ReporteController extends Controller
                 ) === 'SERVICIO';
             })
             ->sum('utilidad');
-
 
         return Pdf::loadView(
             'reporte.pdf.utilidades',
@@ -1469,7 +1384,7 @@ class ReporteController extends Controller
     {
         $datos = $this->consultaUtilidades($request);
 
-        $excel = new Spreadsheet();
+        $excel = new Spreadsheet;
 
         $hoja = $excel->getActiveSheet();
 
@@ -1497,17 +1412,15 @@ class ReporteController extends Controller
             'Descuento',
             'Venta Neta',
             'Costo',
-            'Utilidad'
+            'Utilidad',
 
         ], null, 'A3');
-
 
         $fila = 4;
 
         $totalVenta = 0;
         $totalCosto = 0;
         $totalUtilidad = 0;
-
 
         foreach ($datos as $i => $dato) {
 
@@ -1540,10 +1453,9 @@ class ReporteController extends Controller
 
                 $dato->costo,
 
-                $dato->utilidad
+                $dato->utilidad,
 
-            ], null, 'A' . $fila);
-
+            ], null, 'A'.$fila);
 
             $totalVenta +=
                 (float) $dato->venta_neta;
@@ -1557,38 +1469,35 @@ class ReporteController extends Controller
             $fila++;
         }
 
-
         // ========================================
         // TOTALES
         // ========================================
 
         $hoja->setCellValue(
-            'K' . $fila,
+            'K'.$fila,
             'TOTALES'
         );
 
         $hoja->setCellValue(
-            'L' . $fila,
+            'L'.$fila,
             $totalVenta
         );
 
         $hoja->setCellValue(
-            'M' . $fila,
+            'M'.$fila,
             $totalCosto
         );
 
         $hoja->setCellValue(
-            'N' . $fila,
+            'N'.$fila,
             $totalUtilidad
         );
-
 
         $this->estiloExcel(
             $hoja,
             'N',
             $fila
         );
-
 
         return $this->descargarExcel(
             $excel,
@@ -1642,7 +1551,6 @@ class ReporteController extends Controller
                     ->orWhereRaw("UPPER(f.estado) <> 'ANULADO'");
             });
 
-
         // ============================================
         // SUCURSAL
         // ============================================
@@ -1655,7 +1563,6 @@ class ReporteController extends Controller
             );
         }
 
-
         // ============================================
         // TIPO: PRODUCTO / SERVICIO
         // ============================================
@@ -1667,7 +1574,6 @@ class ReporteController extends Controller
                 $request->tipo
             );
         }
-
 
         return $query
 

@@ -59,7 +59,7 @@
             left: 0;
             right: 0;
             height: 90px;
-            border-bottom: 1px solid #444;
+            border-bottom: 0;
         }
 
         /* LOGO */
@@ -107,17 +107,14 @@
 
 <body>
 
-    <div class="header">
-        {{-- <img class="logo" src="{{ $base64 }}" alt="Logo"> --}}
-        <div class="header-left">
-            <h2>{{ 'VENTA N°' }} {{ $factura->numero_recibo }}</h2>
-            <p>Fecha de venta: {{ $factura->fecha }}</p>
-            <p>Fecha de impresión: {{ date('d/m/Y H:i:s') }}</p>
-        </div>
 
-        <div class="header-right">
-            <p>{{ $factura->sucursal->direccion }}</p>
-        </div>
+    <div class="header">
+        @component('partials.logoReporte')
+            <h2 style="margin:0 0 6px; font-size:16px;">VENTA N° {{ $factura->numero_recibo }}</h2>
+            <p style="margin:2px 0; font-size:11px;">Fecha de venta: {{ $factura->fecha }}</p>
+            <p style="margin:2px 0; font-size:11px;">Fecha de impresión: {{ date('d/m/Y H:i:s') }}</p>
+            <p style="margin:2px 0; font-size:11px;">{{ $factura->sucursal->direccion }}</p>
+        @endcomponent
     </div>
     <table class="table_cliente">
         <tbody>

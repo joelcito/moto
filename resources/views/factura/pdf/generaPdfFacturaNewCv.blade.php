@@ -168,6 +168,7 @@
 </head>
 
 <body>
+
     @php
         // $documento_sector      = $factura->siat_tipo_documento_sector;
         // $tipo_documento_sector = $documento_sector->codigo_clasificador;
@@ -211,8 +212,8 @@
     <table id="logo_factura">
         <tr>
             <td>
-                {{-- <img src="{{ public_path('assets/img') . '/' . $empresa->logo }}" alt="" width="100%"><br> --}}
-                <img src="{{ public_path('assets/img/lop.jpg') }}" alt="" width="100%"><br>
+                @include('partials.logoReporte', ['soloImagen' => true])
+                <br>
             </td>
         </tr>
     </table>

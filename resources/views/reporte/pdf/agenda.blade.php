@@ -35,10 +35,12 @@
 </head>
 
 <body>
+@component('partials.logoReporte')
 
     <h2>REPORTE DE AGENDA</h2>
 
-    <table>
+    @endcomponent
+<table>
 
         <thead>
 
